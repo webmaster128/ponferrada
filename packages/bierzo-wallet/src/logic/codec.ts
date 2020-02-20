@@ -1,3 +1,4 @@
+import { CosmWasmCodec, TokenConfiguration } from "@cosmwasm/bcp";
 import { ChainId, TxCodec } from "@iov/bcp";
 import { bnsCodec } from "@iov/bns";
 import { ethereumCodec } from "@iov/ethereum";
@@ -5,10 +6,23 @@ import { liskCodec } from "@iov/lisk";
 
 import { ChainSpec, CodecType, getConfig } from "../config";
 
+/**
+ * We do lazy loading to ensure the same instance is used for every getCodec() call
+ * which is required to avoid re-render loops of UI components
+ */
+let cosmwasmCodec: CosmWasmCodec | undefined;
+
 export function getCodec(spec: ChainSpec): TxCodec {
   switch (spec.codecType) {
     case CodecType.Bns:
       return bnsCodec;
+    case CodecType.CosmWasm:
+      if (!cosmwasmCodec) {
+        const addressPefix = "cosmos";
+        const tokenConfig: TokenConfiguration = (spec as any).tokenConfig;
+        cosmwasmCodec = new CosmWasmCodec(addressPefix, tokenConfig.bankTokens, tokenConfig.erc20Tokens);
+      }
+      return cosmwasmCodec;
     case CodecType.Ethereum:
       return ethereumCodec;
     case CodecType.Lisk:

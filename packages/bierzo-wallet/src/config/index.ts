@@ -8,6 +8,7 @@ import developmentConfig from "./development.json";
 /** The string value must match the codec type in the config file */
 export enum CodecType {
   Bns = "bns",
+  CosmWasm = "cosmwasm",
   Ethereum = "eth",
   Lisk = "lsk",
 }

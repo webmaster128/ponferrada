@@ -3,6 +3,7 @@
   "version": "1.1.1-alpha.8",
   "private": true,
   "dependencies": {
+    "@cosmwasm/bcp": "^0.0.7",
     "@fortawesome/fontawesome-svg-core": "^1.2.21",
     "@fortawesome/free-regular-svg-icons": "^5.10.1",
     "@fortawesome/react-fontawesome": "^0.1.4",

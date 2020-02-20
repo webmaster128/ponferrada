@@ -1,3 +1,4 @@
+import { createCosmWasmConnector, TokenConfiguration } from "@cosmwasm/bcp";
 import { BlockchainConnection, ChainId } from "@iov/bcp";
 import { BnsConnection, createBnsConnector } from "@iov/bns";
 import { createEthereumConnector, EthereumConnectionOptions } from "@iov/ethereum";
@@ -26,6 +27,15 @@ async function establishBnsConnection(url: string, chainId: ChainId): Promise<vo
   }
 }
 
+async function establishCosmWasmConnection(spec: ChainSpec, chainId: ChainId): Promise<void> {
+  if (!connections.has(chainId)) {
+    const addressPrefix = "cosmos";
+    const tokenConfig: TokenConfiguration = (spec as any).tokenConfig;
+    const connector = createCosmWasmConnector(spec.node, addressPrefix, tokenConfig, chainId);
+    connections.set(chainId, await connector.establishConnection());
+  }
+}
+
 async function establishLiskConnection(url: string, chainId: ChainId): Promise<void> {
   if (!connections.has(chainId)) {
     const connector = createLiskConnector(url, chainId);
@@ -37,6 +47,8 @@ export async function establishConnection(spec: ChainSpec): Promise<void> {
   switch (spec.codecType) {
     case CodecType.Bns:
       return await establishBnsConnection(spec.node, spec.chainId as ChainId);
+    case CodecType.CosmWasm:
+      return await establishCosmWasmConnection(spec, spec.chainId as ChainId);
     case CodecType.Ethereum:
       return await establishEthereumConnection(spec.node, spec.chainId as ChainId, {
         scraperApiUrl: spec.scraper,
